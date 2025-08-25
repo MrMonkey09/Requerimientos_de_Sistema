@@ -1,10 +1,9 @@
 from django.contrib import admin
-from unfold.admin import ModelAdmin
 from .models import MediaFile
 from cms_project.tenants.custom_admin import tenant_admin_site
 
 
-class MediaFileAdmin(ModelAdmin):
+class MediaFileAdmin(admin.ModelAdmin):
     list_display = ['original_name', 'media_type', 'file_size', 'tenant', 'created_at']
     list_filter = ['media_type', 'tenant', 'created_at']
     search_fields = ['original_name', 'description', 'alt_text']

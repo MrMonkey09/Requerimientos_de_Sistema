@@ -1,16 +1,15 @@
 from django.contrib import admin
-from unfold.admin import ModelAdmin, TabularInline
 from .models import Property, PropertyImage, Page, Section, ContactSubmission
 from cms_project.tenants.custom_admin import tenant_admin_site
 
 
-class PropertyImageInline(TabularInline):
+class PropertyImageInline(admin.TabularInline):
     model = PropertyImage
     extra = 1
     fields = ['image', 'alt_text', 'is_main', 'order']
 
 
-class PropertyAdmin(ModelAdmin):
+class PropertyAdmin(admin.ModelAdmin):
     list_display = ['title', 'property_type', 'sale_type', 'price', 'city', 'is_featured', 'is_available', 'tenant']
     list_filter = ['property_type', 'sale_type', 'is_featured', 'is_available', 'tenant', 'created_at']
     search_fields = ['title', 'address', 'city', 'description']
@@ -54,13 +53,13 @@ class PropertyAdmin(ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-class SectionInline(TabularInline):
+class SectionInline(admin.TabularInline):
     model = Section
     extra = 1
     fields = ['section_type', 'title', 'subtitle', 'order', 'is_active']
 
 
-class PageAdmin(ModelAdmin):
+class PageAdmin(admin.ModelAdmin):
     list_display = ['title', 'page_type', 'is_homepage', 'is_active', 'tenant', 'created_at']
     list_filter = ['page_type', 'is_active', 'is_homepage', 'tenant']
     search_fields = ['title', 'slug', 'meta_description']
@@ -89,7 +88,7 @@ class PageAdmin(ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-class SectionAdmin(ModelAdmin):
+class SectionAdmin(admin.ModelAdmin):
     list_display = ['page', 'section_type', 'title', 'order', 'is_active']
     list_filter = ['section_type', 'is_active', 'page__tenant']
     search_fields = ['title', 'subtitle', 'content']
@@ -115,7 +114,7 @@ class SectionAdmin(ModelAdmin):
         return qs
 
 
-class ContactSubmissionAdmin(ModelAdmin):
+class ContactSubmissionAdmin(admin.ModelAdmin):
     list_display = ['name', 'email', 'phone', 'subject', 'property_interest', 'is_read', 'created_at', 'tenant']
     list_filter = ['is_read', 'tenant', 'created_at', 'property_interest']
     search_fields = ['name', 'email', 'phone', 'subject', 'message']
@@ -146,7 +145,7 @@ class ContactSubmissionAdmin(ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-class PropertyImageAdmin(ModelAdmin):
+class PropertyImageAdmin(admin.ModelAdmin):
     list_display = ['property', 'alt_text', 'is_main', 'order', 'created_at']
     list_filter = ['is_main', 'property__tenant']
     search_fields = ['property__title', 'alt_text']
