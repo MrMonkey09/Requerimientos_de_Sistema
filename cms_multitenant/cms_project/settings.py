@@ -14,16 +14,17 @@ ALLOWED_HOSTS = ['*']  # Para desarrollo - cambiar en producción
 
 # Application definition
 INSTALLED_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
+
     # Local apps
     "cms_project.tenants",
-    "cms_project.main", 
+    "cms_project.main",
     "cms_project.media_files",
 ]
 
@@ -114,7 +115,6 @@ JAZZMIN_SETTINGS = {
     "site_brand": "Mi Inmobiliaria",
     "welcome_sign": "Bienvenido al panel de administración",
     "copyright": "Mi Empresa",
-    "search_model": "auth.User",
     "show_sidebar": True,
     "navigation_expanded": True,
     "hide_apps": [],
@@ -135,4 +135,3 @@ JAZZMIN_SETTINGS = {
     "custom_css": None,  # Puedes poner la ruta a tu propio CSS
     "custom_js": None,   # Puedes poner la ruta a tu propio JS
 }
-
