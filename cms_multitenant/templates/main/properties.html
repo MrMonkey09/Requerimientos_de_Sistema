@@ -1,0 +1,161 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Propiedades - {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="hero-section" style="padding: 8rem 0 4rem;">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="hero-title">Nuestras Propiedades</h1>
+                <p class="hero-subtitle">Encuentra tu hogar ideal entre nuestra selección de propiedades</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filters Section -->
+<section class="filters-section">
+    <div class="container">
+        <div class="filter-card">
+            <form method="get" class="row g-3">
+                <div class="col-lg-2 col-md-4">
+                    <label class="form-label">Tipo</label>
+                    <select name="type" class="form-select">
+                        <option value="">Todos</option>
+                        {% for type_key, type_label in property_types %}
+                        <option value="{{ type_key }}" {% if filters.property_type == type_key %}selected{% endif %}>
+                            {{ type_label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label class="form-label">Operación</label>
+                    <select name="sale" class="form-select">
+                        <option value="">Todas</option>
+                        {% for sale_key, sale_label in sale_types %}
+                        <option value="{{ sale_key }}" {% if filters.sale_type == sale_key %}selected{% endif %}>
+                            {{ sale_label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label class="form-label">Ciudad</label>
+                    <select name="city" class="form-select">
+                        <option value="">Todas</option>
+                        {% for city in cities %}
+                        <option value="{{ city }}" {% if filters.city == city %}selected{% endif %}>
+                            {{ city }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label">Precio Mín</label>
+                    <input type="number" name="min_price" class="form-control" value="{{ filters.min_price }}" placeholder="Ej: 100000">
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label">Precio Máx</label>
+                    <input type="number" name="max_price" class="form-control" value="{{ filters.max_price }}" placeholder="Ej: 500000">
+                </div>
+                <div class="col-lg-2 col-md-12 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Properties Grid -->
+<section class="properties-grid">
+    <div class="container">
+        {% if properties %}
+        <div class="row g-4">
+            {% for property in properties %}
+            <div class="col-lg-4 col-md-6">
+                <div class="property-card">
+                    {% if property.get_main_image %}
+                    <div class="property-image" style="background-image: url('{{ property.get_main_image.image.url }}');">
+                    {% else %}
+                    <div class="property-image" style="background: linear-gradient(45deg, #e2e8f0, #cbd5e1); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-image text-secondary" style="font-size: 3rem;"></i>
+                    {% endif %}
+                        <div class="property-price">
+                            ${{ property.price|floatformat:0 }}
+                            {% if property.price_currency != 'USD' %}
+                            {{ property.price_currency }}
+                            {% endif %}
+                        </div>
+                        {% if property.is_featured %}
+                        <div style="position: absolute; top: 1rem; left: 1rem; background: var(--accent-color); color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; font-weight: 600;">
+                            Destacada
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="property-content">
+                        <h5 class="property-title">{{ property.title }}</h5>
+                        <div class="property-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {{ property.address }}, {{ property.city }}
+                        </div>
+                        <div class="property-features">
+                            {% if property.bedrooms %}
+                            <div class="property-feature">
+                                <i class="fas fa-bed"></i>
+                                <span>{{ property.bedrooms }} hab</span>
+                            </div>
+                            {% endif %}
+                            {% if property.bathrooms %}
+                            <div class="property-feature">
+                                <i class="fas fa-bath"></i>
+                                <span>{{ property.bathrooms }} baños</span>
+                            </div>
+                            {% endif %}
+                            {% if property.area %}
+                            <div class="property-feature">
+                                <i class="fas fa-ruler-combined"></i>
+                                <span>{{ property.area }}m²</span>
+                            </div>
+                            {% endif %}
+                            {% if property.parking_spaces %}
+                            <div class="property-feature">
+                                <i class="fas fa-car"></i>
+                                <span>{{ property.parking_spaces }} est</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <p class="text-muted small">{{ property.description|truncatewords:15 }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge bg-primary">{{ property.get_sale_type_display }}</span>
+                            <a href="{% url 'main:property_detail' property.id %}" class="btn btn-outline-primary btn-sm">
+                                Ver Detalles <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Results info -->
+        <div class="text-center mt-5">
+            <p class="text-muted">Mostrando {{ properties|length }} propiedades</p>
+        </div>
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-search" style="font-size: 4rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+            <h4>No se encontraron propiedades</h4>
+            <p class="text-muted">Intenta ajustar los filtros de búsqueda</p>
+            <a href="{% url 'main:properties' %}" class="btn btn-primary">Ver Todas</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

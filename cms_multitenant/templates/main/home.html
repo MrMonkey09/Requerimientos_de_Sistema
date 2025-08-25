@@ -1,0 +1,157 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ page.title }} - {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+{% for section in sections %}
+    {% if section.section_type == 'hero' %}
+    <section class="hero-section" {% if section.background_image %}style="background-image: linear-gradient(rgba(37, 99, 235, 0.8), rgba(16, 185, 129, 0.8)), url('{{ section.background_image.url }}'); background-size: cover; background-position: center;"{% endif %}>
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <div class="hero-content">
+                        <h1 class="hero-title">{{ section.title }}</h1>
+                        <p class="hero-subtitle">{{ section.subtitle }}</p>
+                        {% if section.hero_button_text and section.hero_button_link %}
+                        <a href="{{ section.hero_button_link }}" class="btn-custom">
+                            {{ section.hero_button_text }} <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+<!-- Properties Grid Section -->
+    {% if section.section_type == 'properties_grid' %}
+    <section class="properties-grid">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">{{ section.title }}</h2>
+                <p class="section-subtitle">{{ section.subtitle }}</p>
+            </div>
+            
+            {% if featured_properties %}
+            <div class="row g-4">
+                {% for property in featured_properties %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="property-card">
+                        {% if property.get_main_image %}
+                        <div class="property-image" style="background-image: url('{{ property.get_main_image.image.url }}');">
+                        {% else %}
+                        <div class="property-image" style="background: linear-gradient(45deg, #e2e8f0, #cbd5e1);">
+                        {% endif %}
+                            <div class="property-price">
+                                ${{ property.price|floatformat:0 }}
+                                {% if property.price_currency != 'USD' %}
+                                {{ property.price_currency }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="property-content">
+                            <h5 class="property-title">{{ property.title }}</h5>
+                            <div class="property-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ property.city }}, {{ property.state }}
+                            </div>
+                            <div class="property-features">
+                                {% if property.bedrooms %}
+                                <div class="property-feature">
+                                    <i class="fas fa-bed"></i>
+                                    <span>{{ property.bedrooms }}</span>
+                                </div>
+                                {% endif %}
+                                {% if property.bathrooms %}
+                                <div class="property-feature">
+                                    <i class="fas fa-bath"></i>
+                                    <span>{{ property.bathrooms }}</span>
+                                </div>
+                                {% endif %}
+                                {% if property.area %}
+                                <div class="property-feature">
+                                    <i class="fas fa-ruler-combined"></i>
+                                    <span>{{ property.area }}m²</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-primary fw-semibold">{{ property.get_sale_type_display }}</span>
+                                <a href="{% url 'main:property_detail' property.id %}" class="btn btn-sm btn-outline-primary">Ver más</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-5">
+                <a href="/propiedades" class="btn btn-primary btn-lg">
+                    Ver Todas las Propiedades <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+            {% else %}
+            <div class="text-center">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No hay propiedades destacadas disponibles en este momento.
+                </div>
+                <a href="/propiedades" class="btn btn-primary">Ver Todas las Propiedades</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+<!-- Contact Form Section -->
+    {% if section.section_type == 'contact_form' %}
+    <section class="contact-section" id="contacto">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center mb-5">
+                        <h2 class="section-title">{{ section.title }}</h2>
+                        <p class="section-subtitle">{{ section.subtitle }}</p>
+                    </div>
+                    
+                    <form onsubmit="submitContactForm(event)" class="form-custom">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Nombre Completo *</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="phone" name="phone">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="subject" class="form-label">Asunto</label>
+                                <input type="text" class="form-control" id="subject" name="subject">
+                            </div>
+                            <div class="col-12">
+                                <label for="message" class="form-label">Mensaje *</label>
+                                <textarea class="form-control" id="message" name="message" rows="5" required placeholder="Cuéntanos en qué podemos ayudarte..."></textarea>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-primary-custom">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    Enviar Mensaje
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+{% endfor %}
+{% endblock %}

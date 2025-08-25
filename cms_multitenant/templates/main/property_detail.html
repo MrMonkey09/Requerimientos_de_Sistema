@@ -1,0 +1,291 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ property.title }} - {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<!-- Property Header -->
+<section style="padding: 8rem 0 2rem; background: var(--bg-light);">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'main:home' %}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'main:properties' %}">Propiedades</a></li>
+                        <li class="breadcrumb-item active">{{ property.title }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Property Details -->
+<section style="padding: 2rem 0 4rem;">
+    <div class="container">
+        <div class="row">
+            <!-- Property Images -->
+            <div class="col-lg-8 mb-4">
+                {% if images %}
+                <div id="propertyCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+                    <div class="carousel-inner" style="border-radius: 16px; overflow: hidden;">
+                        {% for image in images %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ image.image.url }}" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="{{ image.alt_text|default:property.title }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if images|length > 1 %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                    {% endif %}
+                </div>
+
+                <!-- Thumbnails -->
+                {% if images|length > 1 %}
+                <div class="row g-2 mb-4">
+                    {% for image in images %}
+                    <div class="col-2">
+                        <img src="{{ image.image.url }}" class="img-fluid rounded" 
+                             style="height: 60px; object-fit: cover; cursor: pointer; opacity: {% if forloop.first %}1{% else %}0.7{% endif %};" 
+                             onclick="document.querySelector('#propertyCarousel .carousel-item.active').classList.remove('active'); document.querySelectorAll('#propertyCarousel .carousel-item')[{{ forloop.counter0 }}].classList.add('active');"
+                             alt="{{ image.alt_text|default:property.title }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="mb-4" style="height: 400px; background: linear-gradient(45deg, #e2e8f0, #cbd5e1); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-image text-secondary" style="font-size: 4rem;"></i>
+                </div>
+                {% endif %}
+
+                <!-- Property Description -->
+                <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                    <div class="card-body p-4">
+                        <h3 class="mb-3">Descripción</h3>
+                        <p class="text-muted">{{ property.description|linebreaks }}</p>
+                        
+                        <hr class="my-4">
+                        
+                        <h4 class="mb-3">Características</h4>
+                        <div class="row g-3">
+                            <div class="col-sm-6 col-md-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-bed text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ property.bedrooms|default:"N/A" }}</div>
+                                        <small class="text-muted">Habitaciones</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-bath text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ property.bathrooms|default:"N/A" }}</div>
+                                        <small class="text-muted">Baños</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-ruler-combined text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ property.area|default:"N/A" }}{% if property.area %}m²{% endif %}</div>
+                                        <small class="text-muted">Área</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-car text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ property.parking_spaces|default:"N/A" }}</div>
+                                        <small class="text-muted">Estacionamientos</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Info Sidebar -->
+            <div class="col-lg-4">
+                <!-- Price and Basic Info -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <div class="display-5 fw-bold text-primary">
+                                ${{ property.price|floatformat:0 }}
+                                {% if property.price_currency != 'USD' %}
+                                <small>{{ property.price_currency }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="text-muted">{{ property.get_sale_type_display }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Tipo:</span>
+                                <span class="fw-semibold">{{ property.get_property_type_display }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Ubicación:</span>
+                                <span class="fw-semibold">{{ property.city }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Estado:</span>
+                                <span class="badge bg-success">Disponible</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="text-muted mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                Dirección completa:
+                            </div>
+                            <div class="fw-semibold">{{ property.address }}, {{ property.city }}, {{ property.state }}{% if property.zip_code %}, {{ property.zip_code }}{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Contactar sobre esta propiedad</h5>
+                        <form onsubmit="submitPropertyContactForm(event)">
+                            {% csrf_token %}
+                            <input type="hidden" name="property_id" value="{{ property.id }}">
+                            <div class="mb-3">
+                                <label for="contact_name" class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" id="contact_name" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact_email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="contact_email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact_phone" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="contact_phone" name="phone">
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact_message" class="form-label">Mensaje *</label>
+                                <textarea class="form-control" id="contact_message" name="message" rows="4" required placeholder="Estoy interesado en esta propiedad...">Estoy interesado en la propiedad "{{ property.title }}" ubicada en {{ property.city }}. Me gustaría obtener más información.</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Enviar Consulta
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Similar Properties -->
+{% if similar_properties %}
+<section style="padding: 4rem 0; background: var(--bg-light);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Propiedades Similares</h2>
+            <p class="section-subtitle">Otras opciones que podrían interesarte</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for similar in similar_properties %}
+            <div class="col-lg-3 col-md-6">
+                <div class="property-card">
+                    {% if similar.get_main_image %}
+                    <div class="property-image" style="background-image: url('{{ similar.get_main_image.image.url }}');">
+                    {% else %}
+                    <div class="property-image" style="background: linear-gradient(45deg, #e2e8f0, #cbd5e1); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-image text-secondary" style="font-size: 2rem;"></i>
+                    {% endif %}
+                        <div class="property-price">
+                            ${{ similar.price|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="property-content">
+                        <h6 class="property-title">{{ similar.title }}</h6>
+                        <div class="property-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {{ similar.city }}
+                        </div>
+                        <div class="property-features">
+                            {% if similar.bedrooms %}
+                            <div class="property-feature">
+                                <i class="fas fa-bed"></i>
+                                <span>{{ similar.bedrooms }}</span>
+                            </div>
+                            {% endif %}
+                            {% if similar.bathrooms %}
+                            <div class="property-feature">
+                                <i class="fas fa-bath"></i>
+                                <span>{{ similar.bathrooms }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'main:property_detail' similar.id %}" class="btn btn-outline-primary btn-sm w-100">Ver Detalles</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function submitPropertyContactForm(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    // Agregar el subject automáticamente
+    data.subject = `Consulta sobre propiedad: {{ property.title }}`;
+    
+    fetch('{% url "main:contact" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            form.reset();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ha ocurrido un error al enviar la consulta');
+    });
+}
+</script>
+{% endblock %}
